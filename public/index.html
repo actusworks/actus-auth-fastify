@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Actus Auth</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+	<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+	<!-- Animated background -->
+	<div class="bg-scene">
+		<div class="blob blob-1"></div>
+		<div class="blob blob-2"></div>
+		<div class="blob blob-3"></div>
+		<canvas id="particles"></canvas>
+		<div class="grid-overlay"></div>
+	</div>
+
+	<!-- Toast container -->
+	<div class="toast-container" id="toastContainer"></div>
+
+	<!-- Main card -->
+	<main class="auth-wrapper">
+		<div class="auth-card">
+
+			<!-- Logo -->
+			<div class="logo-area">
+				<div class="logo-icon">
+					<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<defs>
+							<linearGradient id="logoGrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+								<stop offset="0%" stop-color="#a78bfa"/>
+								<stop offset="100%" stop-color="#38bdf8"/>
+							</linearGradient>
+						</defs>
+						<path d="M24 4L6 14V26C6 35.39 13.68 44.18 24 46C34.32 44.18 42 35.39 42 26V14L24 4Z" fill="url(#logoGrad)" opacity="0.15"/>
+						<path d="M24 4L6 14V26C6 35.39 13.68 44.18 24 46C34.32 44.18 42 35.39 42 26V14L24 4Z" stroke="url(#logoGrad)" stroke-width="2" fill="none"/>
+						<circle cx="24" cy="22" r="5" fill="url(#logoGrad)"/>
+						<path d="M17 34C17 30.13 20.13 27 24 27C27.87 27 31 30.13 31 34" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round"/>
+					</svg>
+				</div>
+				<div class="logo-text">
+					<span class="logo-name">Actus</span>
+					<span class="logo-sub">Auth</span>
+				</div>
+			</div>
+
+			<!-- Tabs -->
+			<div class="tab-bar">
+				<button class="tab active" data-tab="login">Sign In</button>
+				<button class="tab" data-tab="register">Create Account</button>
+				<div class="tab-indicator"></div>
+			</div>
+
+			<!-- LOGIN FORM -->
+			<form id="loginForm" class="auth-form active" novalidate>
+				<p class="form-subtitle">Welcome back. Sign in to continue.</p>
+
+				<div class="field-group">
+					<div class="input-wrap">
+						<span class="input-icon">
+							<svg viewBox="0 0 20 20" fill="none"><path d="M10 10a4 4 0 100-8 4 4 0 000 8zm-7 8a7 7 0 1114 0H3z" fill="currentColor"/></svg>
+						</span>
+						<input type="text" id="loginUsername" name="username" placeholder="Username" autocomplete="username" required />
+					</div>
+
+					<div class="input-wrap">
+						<span class="input-icon">
+							<svg viewBox="0 0 20 20" fill="none"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" fill="currentColor" clip-rule="evenodd"/></svg>
+						</span>
+						<input type="password" id="loginPassword" name="password" placeholder="Password" autocomplete="current-password" required />
+						<button type="button" class="eye-btn" data-target="loginPassword" aria-label="Toggle password">
+							<svg class="eye-open" viewBox="0 0 20 20" fill="none"><path d="M10 3C5.5 3 1.73 5.61 0 9.5 1.73 13.39 5.5 16 10 16s8.27-2.61 10-6.5C18.27 5.61 14.5 3 10 3zm0 11a4.5 4.5 0 110-9 4.5 4.5 0 010 9zm0-7.2a2.7 2.7 0 100 5.4 2.7 2.7 0 000-5.4z" fill="currentColor"/></svg>
+							<svg class="eye-closed" viewBox="0 0 20 20" fill="none" style="display:none"><path d="M13.36 13.36A7.96 7.96 0 0110 14C5.5 14 1.73 11.39 0 7.5c.65-1.43 1.63-2.67 2.84-3.64M5.64 4.64A7.96 7.96 0 0110 3c4.5 0 8.27 2.61 10 6.5a9.07 9.07 0 01-3.64 4.36M1 1l18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+						</button>
+					</div>
+				</div>
+
+				<button type="submit" class="btn-primary" id="loginBtn">
+					<span class="btn-text">Sign In</span>
+					<span class="btn-loader" hidden>
+						<svg viewBox="0 0 24 24" class="spin"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="31.4" stroke-dashoffset="10"/></svg>
+					</span>
+					<span class="btn-arrow">
+						<svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+					</span>
+				</button>
+
+				<p class="form-switch">Don't have an account? <a href="#" data-switch="register">Create one</a></p>
+			</form>
+
+			<!-- REGISTER FORM -->
+			<form id="registerForm" class="auth-form" novalidate>
+				<p class="form-subtitle">Create your account to get started.</p>
+
+				<div class="field-group">
+					<div class="input-wrap">
+						<span class="input-icon">
+							<svg viewBox="0 0 20 20" fill="none"><path d="M10 10a4 4 0 100-8 4 4 0 000 8zm-7 8a7 7 0 1114 0H3z" fill="currentColor"/></svg>
+						</span>
+						<input type="text" id="regUsername" name="username" placeholder="Username" autocomplete="username" required minlength="3" />
+					</div>
+
+					<div class="input-wrap">
+						<span class="input-icon">
+							<svg viewBox="0 0 20 20" fill="none"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884zM18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" fill="currentColor"/></svg>
+						</span>
+						<input type="email" id="regEmail" name="email" placeholder="Email (optional)" autocomplete="email" />
+					</div>
+
+					<div class="input-wrap">
+						<span class="input-icon">
+							<svg viewBox="0 0 20 20" fill="none"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" fill="currentColor" clip-rule="evenodd"/></svg>
+						</span>
+						<input type="password" id="regPassword" name="password" placeholder="Password" autocomplete="new-password" required minlength="8" />
+						<button type="button" class="eye-btn" data-target="regPassword" aria-label="Toggle password">
+							<svg class="eye-open" viewBox="0 0 20 20" fill="none"><path d="M10 3C5.5 3 1.73 5.61 0 9.5 1.73 13.39 5.5 16 10 16s8.27-2.61 10-6.5C18.27 5.61 14.5 3 10 3zm0 11a4.5 4.5 0 110-9 4.5 4.5 0 010 9zm0-7.2a2.7 2.7 0 100 5.4 2.7 2.7 0 000-5.4z" fill="currentColor"/></svg>
+							<svg class="eye-closed" viewBox="0 0 20 20" fill="none" style="display:none"><path d="M13.36 13.36A7.96 7.96 0 0110 14C5.5 14 1.73 11.39 0 7.5c.65-1.43 1.63-2.67 2.84-3.64M5.64 4.64A7.96 7.96 0 0110 3c4.5 0 8.27 2.61 10 6.5a9.07 9.07 0 01-3.64 4.36M1 1l18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+						</button>
+					</div>
+
+					<div class="input-wrap" id="inviteWrap">
+						<span class="input-icon">
+							<svg viewBox="0 0 20 20" fill="none"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" fill="currentColor"/></svg>
+						</span>
+						<input type="text" id="regInvite" name="inviteCode" placeholder="Invite code (if required)" autocomplete="off" />
+					</div>
+				</div>
+
+				<div class="strength-meter" id="strengthMeter">
+					<div class="strength-bar">
+						<div class="strength-fill" id="strengthFill"></div>
+					</div>
+					<span class="strength-label" id="strengthLabel">Password strength</span>
+				</div>
+
+				<button type="submit" class="btn-primary" id="registerBtn">
+					<span class="btn-text">Create Account</span>
+					<span class="btn-loader" hidden>
+						<svg viewBox="0 0 24 24" class="spin"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="31.4" stroke-dashoffset="10"/></svg>
+					</span>
+					<span class="btn-arrow">
+						<svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+					</span>
+				</button>
+
+				<p class="form-switch">Already have an account? <a href="#" data-switch="login">Sign in</a></p>
+			</form>
+
+		</div>
+	</main>
+
+	<script src="actus-auth.js"></script>
+</body>
+</html>

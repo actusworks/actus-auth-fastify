@@ -41,18 +41,19 @@ await fastify.register(actusAuth, {
     routePrefix:      '/auth',
     protectedPrefix:  '/v1',
     inviteCode:       process.env.INVITE_CODE,  // omit for open registration
+    adminPassword:    process.env.ADMIN_PASSWORD,  // omit to disable auto-seeding admin account
     publicRoutes:     ['/v1/public'],
 });
 
 
-// Seeding an admin user on startup
+// Seeding a user
 try {
     await fastify.auth.register({
-		username: 'admin',
-		password: process.env.ADMIN_PASSWORD,
-		role:     'admin',
+		username: 'uname',
+		password: 'userpass',
+		role:     'user',
     });
-    fastify.log.info('Admin account created');
+    fastify.log.info('Account created');
 } catch (err) {
     if (err.code !== 'USERNAME_TAKEN') throw err;
     // already exists — no action needed
