@@ -1,0 +1,22 @@
+{
+  "name": "actus-auth",
+  "version": "1.0.0",
+  "description": "Self-contained Fastify auth plugin with SQLite, JWT, and bcrypt",
+  "type": "module",
+  "main": "index.js",
+  "exports": "./index.js",
+  "files": [
+    "index.js",
+    "db.js",
+    "routes.js"
+  ],
+  "dependencies": {
+    "@fastify/jwt": "^10.0.0",
+    "bcrypt": "^6.0.0",
+    "better-sqlite3": "^9.4.3",
+    "fastify-plugin": "^4.5.1"
+  },
+  "peerDependencies": {
+    "fastify": ">=4.0.0"
+  }
+}
