@@ -16,7 +16,7 @@ async function authPlugin(fastify, opts) {
 		publicRoutes    = [],
 	} = opts;
 
-	if (!jwtSecret) throw new Error('[actus-auth] jwtSecret is required');
+	if (!jwtSecret) throw new Error('[actus-auth-fastify] jwtSecret is required');
 
 	// Register JWT
 	await fastify.register(jwt, { secret: jwtSecret });

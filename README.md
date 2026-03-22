@@ -19,7 +19,7 @@ Handles user registration, login, and token refresh — backed by SQLite and sig
 ## Installation
 
 ```bash
-npm install actus-auth
+npm install actus-auth-fastify
 ```
 
 > **Peer dependency:** requires `fastify >= 4.0.0`
@@ -30,7 +30,7 @@ npm install actus-auth
 
 ```js
 import Fastify    from 'fastify';
-import actusAuth from 'actus-auth';
+import actusAuth from 'actus-auth-fastify';
 
 const fastify = Fastify({ logger: true });
 

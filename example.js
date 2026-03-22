@@ -10,12 +10,12 @@
 
 // MARK: SERVER
 // -----------------------------------
-// npm install actus-auth
-// npm install --install-links E:\DEV\DEV\actus-auth
+// npm install actus-auth-fastify
+// npm install --install-links E:\DEV\DEV\actus-auth-fastify
 
 
 import Fastify    from 'fastify';
-import actusAuth from 'actus-auth';
+import actusAuth from 'actus-auth-fastify';
 
 const fastify = Fastify({ logger: true });
 
