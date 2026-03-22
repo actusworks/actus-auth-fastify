@@ -1,6 +1,6 @@
 {
   "name": "actus-auth-fastify",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "description": "Self-contained Fastify auth plugin with SQLite, JWT, and bcrypt",
   "type": "module",
   "main": "index.js",

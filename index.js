@@ -43,6 +43,7 @@ async function authPlugin(fastify, opts) {
 		}
 	});
 
+	
 	// Decorate fastify with db so other routes in the server can access it if needed.
 	// fastify.auth.register(opts) lets server-side code create users programmatically
 	// without going through the HTTP route (bypasses invite code check by design).
@@ -50,6 +51,24 @@ async function authPlugin(fastify, opts) {
 	fastify.decorate('auth', {
 		register: (opts) => createUser(db, opts),
 	});
+
+
+
+	// Auto-seed admin account when ADMIN_PASSWORD is provided.
+	// opts.adminPassword takes precedence over the environment variable.
+	const adminPassword = opts.adminPassword ?? process.env.ADMIN_PASSWORD;
+	if (adminPassword) {
+		fastify.addHook('onReady', async () => {
+			try {
+				await createUser(db, { username: 'admin', password: adminPassword, role: 'admin' });
+				fastify.log.info('[actus-auth-fastify] Admin account created');
+			} catch (err) {
+				if (err.code !== 'USERNAME_TAKEN') throw err;
+			}
+		});
+	}
+
+
 }
 
 

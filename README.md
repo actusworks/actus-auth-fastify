@@ -1,4 +1,4 @@
-# Actus Auth
+# Actus Auth Fastify
 
 A self-contained Fastify plugin that drops into any server with a single `register` call.  
 Handles user registration, login, and token refresh — backed by SQLite and signed JWTs.
@@ -63,6 +63,7 @@ Pass options as the second argument to `fastify.register()`.
 | `protectedPrefix` | `string` | `'/v1'` | Routes starting with this prefix require a valid JWT. |
 | `inviteCode` | `string \| null` | `null` | If set, `POST /auth/register` requires a matching `inviteCode` in the body. |
 | `publicRoutes` | `string[]` | `[]` | Additional URL prefixes to exclude from JWT verification. |
+| `adminPassword` | `string \| undefined` | `undefined` | If set, an `admin` account is created automatically on startup (see [Auto-seed admin](#auto-seed-admin)). Falls back to `process.env.ADMIN_PASSWORD` if not passed directly. |
 
 ### Generate a strong JWT secret
 
@@ -82,6 +83,7 @@ await fastify.register(authPlugin, {
   protectedPrefix:  '/v1',
   inviteCode:       process.env.INVITE_CODE,  // omit for open registration
   publicRoutes:     ['/v1/public'],
+  adminPassword:    process.env.ADMIN_PASSWORD, // omit if not needed
 });
 ```
 
@@ -182,26 +184,41 @@ fastify.get('/v1/me', async (req) => {
 
 ## Server-Side Usage
 
-### Seeding an admin user on startup
+### Auto-seed admin
 
-`fastify.auth.register()` creates a user programmatically, bypassing the HTTP route and invite code check. Useful for seeding an initial admin account.
+Pass `adminPassword` (or set the `ADMIN_PASSWORD` environment variable) and the plugin will automatically create an `admin` account when the server starts. If the account already exists the step is silently skipped.
+
+`opts.adminPassword` takes precedence over `process.env.ADMIN_PASSWORD`.
 
 ```js
+// Option A — via plugin option
+await fastify.register(authPlugin, {
+  jwtSecret:     process.env.JWT_SECRET,
+  adminPassword: process.env.ADMIN_PASSWORD,
+});
+
+// Option B — via environment variable only (no extra option needed)
+// set ADMIN_PASSWORD=secret in your environment, then:
 await fastify.register(authPlugin, {
   jwtSecret: process.env.JWT_SECRET,
 });
+```
 
-// Seed an admin account if it doesn't exist yet
+The account is seeded inside Fastify's `onReady` hook, so it runs after the plugin is fully initialised but before the server accepts requests.
+
+### Seeding users programmatically
+
+`fastify.auth.register()` creates a user programmatically, bypassing the HTTP route and invite code check. Use this for any server-side user creation beyond the admin account.
+
+```js
 try {
   await fastify.auth.register({
-    username: 'admin',
-    password: process.env.ADMIN_PASSWORD,
-    role:     'admin',
+    username: 'alice',
+    password: 'hunter2',
+    role:     'user',
   });
-  fastify.log.info('Admin account created');
 } catch (err) {
   if (err.code !== 'USERNAME_TAKEN') throw err;
-  // already exists — no action needed
 }
 ```
 
