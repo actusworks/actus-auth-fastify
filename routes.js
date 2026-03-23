@@ -1,4 +1,5 @@
 import { createUser } from './db.js';
+import bcrypt   from 'bcrypt';
 
 export function registerAuthRoutes(fastify, db, opts) {
 	const {

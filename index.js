@@ -32,6 +32,7 @@ async function authPlugin(fastify, opts) {
 	const authPrefix = `${protectedPrefix}${routePrefix}/`;
 
 	fastify.addHook('preHandler', async (request, reply) => {
+		//console.log('------ URL --->', request.url);
 		if (!request.url.startsWith(protectedPrefix)) return;
 		if (request.url.startsWith(authPrefix)) return;
 		if (publicRoutes.some(p => request.url.startsWith(p))) return;
