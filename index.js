@@ -1,7 +1,7 @@
-import fp                     from 'fastify-plugin';
-import jwt                    from '@fastify/jwt';
-import { openDb, createUser } from './db.js';
-import { registerAuthRoutes } from './routes.js';
+import fp                                           from 'fastify-plugin';
+import jwt                                          from '@fastify/jwt';
+import { openDb, createUser, createApiKey, verifyApiKey, revokeApiKey } from './db.js';
+import { registerAuthRoutes }                       from './routes.js';
 // ----------------------------------------------------
 
 
@@ -32,11 +32,20 @@ async function authPlugin(fastify, opts) {
 	const authPrefix = `${protectedPrefix}${routePrefix}/`;
 
 	fastify.addHook('preHandler', async (request, reply) => {
-		//console.log('------ URL --->', request.url);
 		if (!request.url.startsWith(protectedPrefix)) return;
 		if (request.url.startsWith(authPrefix)) return;
 		if (publicRoutes.some(p => request.url.startsWith(p))) return;
 
+		// API key authentication (X-API-Key header)
+		const apiKeyHeader = request.headers['x-api-key'];
+		if (apiKeyHeader) {
+			const keyRecord = verifyApiKey(db, apiKeyHeader);
+			if (!keyRecord) return reply.status(401).send({ error: 'Invalid API key' });
+			request.user = { id: keyRecord.id, role: keyRecord.role, type: 'apikey' };
+			return;
+		}
+
+		// Fall back to JWT
 		try {
 			await request.jwtVerify();
 		} catch {
@@ -50,7 +59,9 @@ async function authPlugin(fastify, opts) {
 	// without going through the HTTP route (bypasses invite code check by design).
 	fastify.decorate('authDb', db);
 	fastify.decorate('auth', {
-		register: (opts) => createUser(db, opts),
+		register:      (opts) => createUser(db, opts),
+		createApiKey:  (opts) => createApiKey(db, opts),
+		revokeApiKey:  (id)   => revokeApiKey(db, id),
 	});
 
 

@@ -1,4 +1,4 @@
-import { createUser } from './db.js';
+import { createUser, createApiKey, revokeApiKey } from './db.js';
 import bcrypt   from 'bcrypt';
 
 export function registerAuthRoutes(fastify, db, opts) {
@@ -70,5 +70,49 @@ export function registerAuthRoutes(fastify, db, opts) {
 		} catch {
 			return reply.status(401).send({ error: 'Invalid refresh token' });
 		}
+	});
+
+
+	// MARK: API KEYS (admin only)
+	// These routes live under the auth prefix so the main preHandler skips them;
+	// each route performs its own JWT verification and admin role check.
+
+	// Helper: require a valid JWT with role 'admin'
+	async function requireAdmin(req, reply) {
+		try { await req.jwtVerify(); } catch { return reply.status(401).send({ error: 'Unauthorized' }); }
+		if (req.user?.role !== 'admin') return reply.status(403).send({ error: 'Forbidden' });
+	}
+
+	// POST {routePrefix}/api-keys
+	// Body: { name, role? }
+	// Returns: { id, name, role, key }  — key is shown once, store it securely
+	fastify.post(`${routePrefix}/api-keys`, async (req, reply) => {
+		const stop = await requireAdmin(req, reply);
+		if (stop !== undefined) return;
+
+		const { name, role = 'service' } = req.body ?? {};
+		if (!name) return reply.status(400).send({ error: 'name is required' });
+
+		const result = createApiKey(db, { name, role });
+		reply.status(201).send(result);
+	});
+
+	// GET {routePrefix}/api-keys
+	// Returns: [{ id, name, role, created }, ...]
+	fastify.get(`${routePrefix}/api-keys`, async (req, reply) => {
+		const stop = await requireAdmin(req, reply);
+		if (stop !== undefined) return;
+
+		const keys = db.prepare('SELECT id, name, role, created FROM api_keys').all();
+		reply.send(keys);
+	});
+
+	// DELETE {routePrefix}/api-keys/:id
+	fastify.delete(`${routePrefix}/api-keys/:id`, async (req, reply) => {
+		const stop = await requireAdmin(req, reply);
+		if (stop !== undefined) return;
+
+		revokeApiKey(db, req.params.id);
+		reply.send({ ok: true });
 	});
 }
