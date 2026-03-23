@@ -47,7 +47,7 @@ export function registerAuthRoutes(fastify, db, opts) {
 			return reply.status(401).send({ error: 'Invalid credentials' });
 		}
 
-		const accessToken  = fastify.jwt.sign({ id: user.id, role: user.role }, { expiresIn: accessTokenExpiry });
+		const accessToken  = fastify.jwt.sign({ id: user.id, role: user.role, name: user.username }, { expiresIn: accessTokenExpiry });
 		const refreshToken = fastify.jwt.sign({ id: user.id }, { expiresIn: refreshTokenExpiry });
 
 		reply.send({ accessToken, refreshToken });
@@ -62,10 +62,10 @@ export function registerAuthRoutes(fastify, db, opts) {
 	fastify.post(`${routePrefix}/refresh`, async (req, reply) => {
 		try {
 			const payload    = fastify.jwt.verify(req.body.refreshToken);
-			const user       = db.prepare('SELECT id, role FROM users WHERE id = ?').get(payload.id);
+			const user       = db.prepare('SELECT id, role, username FROM users WHERE id = ?').get(payload.id);
 			if (!user) return reply.status(401).send({ error: 'User not found' });
 
-			const newAccessToken = fastify.jwt.sign({ id: user.id, role: user.role }, { expiresIn: accessTokenExpiry });
+			const newAccessToken = fastify.jwt.sign({ id: user.id, role: user.role, name: user.username }, { expiresIn: accessTokenExpiry });
 			reply.send({ accessToken: newAccessToken });
 		} catch {
 			return reply.status(401).send({ error: 'Invalid refresh token' });
