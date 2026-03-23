@@ -41,7 +41,7 @@ async function authPlugin(fastify, opts) {
 		if (apiKeyHeader) {
 			const keyRecord = verifyApiKey(db, apiKeyHeader);
 			if (!keyRecord) return reply.status(401).send({ error: 'Invalid API key' });
-			request.user = { id: keyRecord.id, role: keyRecord.role, name: keyRecord.name, type: 'apikey' };
+			request.user = { id: keyRecord.id, role: keyRecord.role, name: `AK-${keyRecord.name}`, type: 'apikey' };
 			return;
 		}
 
