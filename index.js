@@ -2,7 +2,7 @@ import fp                     from 'fastify-plugin';
 import jwt                    from '@fastify/jwt';
 import { openDb, createUser } from './db.js';
 import { registerAuthRoutes } from './routes.js';
-
+// ----------------------------------------------------
 
 
 
